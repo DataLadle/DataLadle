@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --background: #020617;
+  --foreground: #e2e8f0;
+  --brand-primary: #26ade4;
+  --brand-secondary: #68c6ec;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* Print styles: hide app chrome, show only report content */
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .no-print,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Hide main layout padding (sidebar offset) */
+  .pl-56 {
+    padding-left: 0 !important;
+  }
+
+  /* Report preview: paper-like appearance */
+  .report-preview {
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Ensure report prints with white background */
+  .report-preview,
+  .report-preview * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

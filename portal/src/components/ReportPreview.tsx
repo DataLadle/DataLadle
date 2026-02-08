@@ -1,0 +1,148 @@
+"use client";
+
+import { useRef } from "react";
+import { Download, Printer } from "lucide-react";
+
+export type ReportType = "compliance" | "health" | "incident";
+
+export interface ReportData {
+  type: ReportType;
+  clientName: string;
+  location: string;
+  dateRange: string;
+  generatedAt: string;
+  rows: Array<Record<string, string | number>>;
+  columns: string[];
+}
+
+interface ReportPreviewProps {
+  data: ReportData | null;
+}
+
+export function ReportPreview({ data }: ReportPreviewProps) {
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownloadPDF = () => {
+    // Mock: trigger print dialog which user can save as PDF
+    window.print();
+  };
+
+  if (!data) {
+    return (
+      <div className="rounded-xl border border-slate-700/80 bg-slate-900 p-8">
+        <h3 className="mb-4 font-semibold text-white">Recent Reports</h3>
+        <ul className="space-y-3">
+          {[
+            { name: "Compliance Check - Last 7 Days", date: "Feb 4, 2025" },
+            { name: "System Health - Headquarters", date: "Feb 3, 2025" },
+            { name: "Incident Summary - Jan 2025", date: "Feb 1, 2025" },
+          ].map((r, i) => (
+            <li
+              key={i}
+              className="flex items-center justify-between rounded-lg border border-slate-700/50 bg-slate-800/30 px-4 py-3 text-slate-300"
+            >
+              <span className="text-sm">{r.name}</span>
+              <span className="text-xs text-slate-500">{r.date}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 text-center text-sm text-slate-500">
+          Configure filters and click Generate Report to create a new one.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2 print:hidden">
+        <button
+          type="button"
+          onClick={handleDownloadPDF}
+          className="flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition-colors hover:bg-slate-700"
+        >
+          <Download className="h-4 w-4" />
+          Download PDF
+        </button>
+        <button
+          type="button"
+          onClick={handlePrint}
+          className="flex items-center gap-2 rounded-lg bg-[#26ADE4] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#26ADE4]/90"
+        >
+          <Printer className="h-4 w-4" />
+          Print
+        </button>
+      </div>
+
+      <div
+        ref={printRef}
+        className="report-preview overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg print:shadow-none"
+      >
+        {/* Header */}
+        <div className="border-b border-slate-200 bg-slate-50 px-8 py-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-slate-900">{data.clientName}</h1>
+              <p className="mt-1 text-slate-600">{data.location}</p>
+              <p className="mt-1 text-sm text-slate-500">Date Range: {data.dateRange}</p>
+            </div>
+            <div className="text-right">
+              <span className="text-lg font-bold text-[#26ADE4]">DATA LADLE</span>
+              <p className="text-xs text-slate-500">IoT Monitoring</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-8 py-6">
+          <h2 className="mb-4 text-lg font-semibold text-slate-800">
+            {data.type === "compliance" && "Temperature Compliance Log"}
+            {data.type === "health" && "System Health Overview"}
+            {data.type === "incident" && "Incident Summary"}
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="border-b-2 border-slate-200 bg-slate-100">
+                  {data.columns.map((col) => (
+                    <th
+                      key={col}
+                      className="px-4 py-3 text-left font-semibold text-slate-700"
+                    >
+                      {col}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {data.rows.map((row, i) => (
+                  <tr
+                    key={i}
+                    className="border-b border-slate-100 hover:bg-slate-50"
+                  >
+                    {data.columns.map((col) => (
+                      <td key={col} className="px-4 py-3 text-slate-700">
+                        {row[col]}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-slate-200 bg-slate-50 px-8 py-4">
+          <p className="text-xs text-slate-500">
+            Generated by Data Ladle on {data.generatedAt}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
